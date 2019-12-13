@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac4e03a2a567303458360c3603ecf480, type: 3}
+  m_Name: Jolt Sword
+  m_EditorClassIdentifier: 
+  abilityName: Jolt Sword
+  abiltiySprite: {fileID: 21300000, guid: 56012c845c405664d8c417ab0b79428a, type: 3}
+  abilitySound: {fileID: 8300000, guid: ae87de454719156479fdffbab9708553, type: 3}
+  abilityBaseCoolDown: 3
+  maxDistance: 0
+  throwForce: 10
+  projectile: {fileID: 7892565545265720014, guid: 156c8ef47e834e24dba8bd44c4749e55,
+    type: 3}
+  reactivate: 0
