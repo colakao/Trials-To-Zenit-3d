@@ -1,49 +1,42 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-public class InputManager : MonoBehaviour
+public class InputManager
 {
-    PlayerAttack playerAttack;
-    ThirdPersonMovement tpm;
-
-    private void Awake()
+    public static bool LightAttack()
     {
-        playerAttack = FindObjectOfType<PlayerAttack>();
+        return Input.GetMouseButtonDown(0);
     }
 
-    void Update()
+    public static bool HeavyAttack()
     {
-        if (Input.GetKeyDown(KeyCode.Mouse0))
-        {
-            playerAttack.LightAttack();
-        }
+        return Input.GetMouseButtonDown(1);
+    }
 
-        if (Input.GetKeyDown(KeyCode.Mouse1))
-        {
-            playerAttack.HeavyAttack();
-        }
+    public static bool DashAttack()
+    {
+        return Input.GetKeyDown(KeyCode.LeftShift);
+    }
 
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            playerAttack.FirstAbility();
-        }
+    public static bool FirstAbility()
+    {
+        return Input.GetKeyDown(KeyCode.Q);
+    }
 
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            playerAttack.SecondAbility();
-        }
+    public static bool SecondAbility()
+    {
+        return Input.GetKeyDown(KeyCode.E);
+    }
 
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        {
-            playerAttack.Dash();
-        }
+    public static bool UltimateAbility()
+    {
+        return Input.GetKeyDown(KeyCode.R);
+    }
 
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            playerAttack.UltimateAbility();
-        }
-
-
+    public static bool Jump()
+    {
+        return Input.GetKeyDown(KeyCode.Space);
     }
 }

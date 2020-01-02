@@ -5,22 +5,30 @@ using UnityEngine;
 public class ThirdPersonMovement : MonoBehaviour
 {
     [Range(1f,15f)]
-    public float speed;
+    public float speed = 8f;
     [Range(10f, 100f)]
-    public float turnSpeed;
+    public float turnSpeed = 30f;
+    private float gravity = 9.81f;
 
     Camera mainCamera;
-
-    Vector2 input;
+    Rigidbody rigidBody;
 
     Vector3 camF;
     Vector3 camR;
 
-    bool isMoving;
+    bool isGrounded;
+
+    Vector2 input;
+
+    //Input actions
+    PlayerInput playerInput;
+
 
     private void Awake()
     {
         mainCamera = Camera.main;
+        rigidBody = GetComponent<Rigidbody>();
+        playerInput = new PlayerInput();
     }
 
     private void FixedUpdate()
@@ -31,8 +39,12 @@ public class ThirdPersonMovement : MonoBehaviour
 
     private void PlayerMovement()
     {
-        input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        input = Vector2.ClampMagnitude(input, 1);
+        var movementInput = playerInput.Player.Movement.ReadValue<Vector2>();
+        input = new Vector2()
+        {
+            x = movementInput.x,
+            y = movementInput.y
+        };
 
         camF = mainCamera.transform.forward;
         camR = mainCamera.transform.right;
@@ -43,7 +55,6 @@ public class ThirdPersonMovement : MonoBehaviour
         camR.Normalize();
 
         transform.position += (camF * input.y + camR * input.x) * speed * Time.deltaTime;
-
     }
 
     private void PlayerRotation()
@@ -56,5 +67,15 @@ public class ThirdPersonMovement : MonoBehaviour
             Quaternion rot = Quaternion.LookRotation(intent);
             transform.rotation = Quaternion.Lerp(transform.rotation, rot, turnSpeed * Time.deltaTime);
         }
+    }
+
+    private void OnEnable()
+    {
+        playerInput.Player.Enable();
+    }
+
+    private void OnDisable()
+    {
+        playerInput.Player.Disable();
     }
 }

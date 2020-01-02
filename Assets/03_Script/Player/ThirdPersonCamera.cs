@@ -5,14 +5,18 @@ using UnityEngine;
 public class ThirdPersonCamera : MonoBehaviour
 {
 
-    public Transform target, player;
-    public float RotationSpeed = 1f;
+    public Transform target;
+    [Range(300f, 1000f)]
+    public float RotationSpeed = 400f;
+    public float rotationMin = -40f;
+    public float rotationMax = 70f;
     float mouseX, mouseY;
 
+    PlayerInput playerInput;
 
-    void Start()
+    private void Awake()
     {
-        //offset = transform.position - target.position;
+        playerInput = new PlayerInput();
         Cursor.lockState = CursorLockMode.Locked;
     }
 
@@ -23,9 +27,23 @@ public class ThirdPersonCamera : MonoBehaviour
 
     void CamControl()
     {
-        mouseX += Input.GetAxisRaw("Mouse X") * RotationSpeed;
-        mouseY -= Input.GetAxisRaw("Mouse Y") * RotationSpeed;
+        var rotateInput = playerInput.Camera.CameraRotation.ReadValue<Vector2>();
+
+        mouseX += rotateInput.x * RotationSpeed / Screen.width;  
+        mouseY -= rotateInput.y * RotationSpeed / Screen.height;
+
+        mouseY = Mathf.Clamp(mouseY,rotationMin, rotationMax);
 
         target.rotation = Quaternion.Euler(mouseY, mouseX, transform.rotation.z);
+    }
+
+    private void OnEnable()
+    {
+        playerInput.Camera.Enable();
+    }
+
+    private void OnDisable()
+    {
+        playerInput.Camera.Disable();
     }
 }
