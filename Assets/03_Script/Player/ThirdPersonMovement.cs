@@ -23,10 +23,14 @@ public class ThirdPersonMovement : MonoBehaviour
     //Input actions
     PlayerInput playerInput;
 
+    //Player Animator
+    Animator playerAnimator;
+
 
     private void Awake()
     {
         mainCamera = Camera.main;
+        playerAnimator = transform.GetChild(0).GetComponent<Animator>();
         rigidBody = GetComponent<Rigidbody>();
         playerInput = new PlayerInput();
     }
@@ -64,8 +68,13 @@ public class ThirdPersonMovement : MonoBehaviour
 
         if (input.magnitude > 0)
         {
+            playerAnimator.SetInteger("condition", 1);
             Quaternion rot = Quaternion.LookRotation(intent);
             transform.rotation = Quaternion.Lerp(transform.rotation, rot, turnSpeed * Time.deltaTime);
+        }
+        else if (input.magnitude == 0)
+        {
+            playerAnimator.SetInteger("condition", 0);
         }
     }
 
