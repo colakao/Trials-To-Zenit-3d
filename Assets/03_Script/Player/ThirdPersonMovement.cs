@@ -68,7 +68,7 @@ public class ThirdPersonMovement : MonoBehaviour
 
         if (input.magnitude > 0)
         {
-            playerAnimator.SetInteger("condition", 1);
+            playerAnimator.SetInteger("condition", 2);
             Quaternion rot = Quaternion.LookRotation(intent);
             transform.rotation = Quaternion.Lerp(transform.rotation, rot, turnSpeed * Time.deltaTime);
         }

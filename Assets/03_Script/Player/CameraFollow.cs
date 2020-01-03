@@ -5,7 +5,8 @@ using UnityEngine;
 public class CameraFollow : MonoBehaviour
 {
 
-    GameObject target;
+    GameObject player;
+    ThirdPersonCamera cameraMain;
 
     [Range(0.01f, 0.3f)]
     public float smoothTime = 0.1f;
@@ -14,13 +15,16 @@ public class CameraFollow : MonoBehaviour
 
     void Start()
     {
-        target = GameObject.FindGameObjectWithTag("Player");
-        offset = transform.position - target.transform.position;
+        cameraMain = GameObject.FindObjectOfType<ThirdPersonCamera>();
+        player = GameObject.FindGameObjectWithTag("Player");
+        offset = transform.position - player.transform.position;
     }
+
 
     private void FixedUpdate()
     {
-        Vector3 targetCamPos = target.transform.position + offset;
+        var updatedOffset = offset + cameraMain.newOffset;
+        Vector3 targetCamPos = new Vector3(player.transform.position.x, player.transform.position.y + 1.5f, player.transform.position.z) + offset;
         transform.position = Vector3.SmoothDamp(transform.position, targetCamPos, ref velocity, smoothTime);
     }
 }

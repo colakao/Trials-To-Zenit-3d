@@ -20,9 +20,9 @@ public class @PlayerInput : IInputActionCollection, IDisposable
             ""actions"": [
                 {
                     ""name"": ""Jump"",
-                    ""type"": ""PassThrough"",
+                    ""type"": ""Button"",
                     ""id"": ""48158ad0-43d1-4a00-b7f3-e77f6688a661"",
-                    ""expectedControlType"": """",
+                    ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": ""Press""
                 },
@@ -284,6 +284,14 @@ public class @PlayerInput : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Vector2"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""CameraZoom"",
+                    ""type"": ""Value"",
+                    ""id"": ""3f3328d3-33cf-4cbd-90ee-f04d6629b0de"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -295,6 +303,17 @@ public class @PlayerInput : IInputActionCollection, IDisposable
                     ""processors"": """",
                     ""groups"": ""Keyboard and Mouse"",
                     ""action"": ""CameraRotation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c627ad1e-d27c-43be-99b2-d4eb0d162a3c"",
+                    ""path"": ""<Mouse>/scroll/y"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard and Mouse"",
+                    ""action"": ""CameraZoom"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -333,6 +352,7 @@ public class @PlayerInput : IInputActionCollection, IDisposable
         // Camera
         m_Camera = asset.FindActionMap("Camera", throwIfNotFound: true);
         m_Camera_CameraRotation = m_Camera.FindAction("CameraRotation", throwIfNotFound: true);
+        m_Camera_CameraZoom = m_Camera.FindAction("CameraZoom", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -472,11 +492,13 @@ public class @PlayerInput : IInputActionCollection, IDisposable
     private readonly InputActionMap m_Camera;
     private ICameraActions m_CameraActionsCallbackInterface;
     private readonly InputAction m_Camera_CameraRotation;
+    private readonly InputAction m_Camera_CameraZoom;
     public struct CameraActions
     {
         private @PlayerInput m_Wrapper;
         public CameraActions(@PlayerInput wrapper) { m_Wrapper = wrapper; }
         public InputAction @CameraRotation => m_Wrapper.m_Camera_CameraRotation;
+        public InputAction @CameraZoom => m_Wrapper.m_Camera_CameraZoom;
         public InputActionMap Get() { return m_Wrapper.m_Camera; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -489,6 +511,9 @@ public class @PlayerInput : IInputActionCollection, IDisposable
                 @CameraRotation.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnCameraRotation;
                 @CameraRotation.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnCameraRotation;
                 @CameraRotation.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnCameraRotation;
+                @CameraZoom.started -= m_Wrapper.m_CameraActionsCallbackInterface.OnCameraZoom;
+                @CameraZoom.performed -= m_Wrapper.m_CameraActionsCallbackInterface.OnCameraZoom;
+                @CameraZoom.canceled -= m_Wrapper.m_CameraActionsCallbackInterface.OnCameraZoom;
             }
             m_Wrapper.m_CameraActionsCallbackInterface = instance;
             if (instance != null)
@@ -496,6 +521,9 @@ public class @PlayerInput : IInputActionCollection, IDisposable
                 @CameraRotation.started += instance.OnCameraRotation;
                 @CameraRotation.performed += instance.OnCameraRotation;
                 @CameraRotation.canceled += instance.OnCameraRotation;
+                @CameraZoom.started += instance.OnCameraZoom;
+                @CameraZoom.performed += instance.OnCameraZoom;
+                @CameraZoom.canceled += instance.OnCameraZoom;
             }
         }
     }
@@ -523,5 +551,6 @@ public class @PlayerInput : IInputActionCollection, IDisposable
     public interface ICameraActions
     {
         void OnCameraRotation(InputAction.CallbackContext context);
+        void OnCameraZoom(InputAction.CallbackContext context);
     }
 }
