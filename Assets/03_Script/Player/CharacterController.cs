@@ -21,7 +21,10 @@ public class CharacterController : MonoBehaviour
     [System.Serializable]
     public class PhysSettings
     {
-        public float downAccel = 0.75f;
+        public float gravity = -9.81f;
+
+        public float fullJumpMult = 2.5f;
+        public float lowJumpMult = 2f;
     }
 
     [System.Serializable]
@@ -91,7 +94,7 @@ public class CharacterController : MonoBehaviour
     {
         PlayerMovement();
         PlayerRotation();
-        Jump();
+        //Jump();
         rBody.velocity = transform.TransformDirection(velocity);
     }
 
@@ -114,13 +117,11 @@ public class CharacterController : MonoBehaviour
 
         transform.position += (camF * input.y + camR * input.x) * moveSettings.runVelocity * Time.deltaTime;
 
-        if (Grounded())
+        //Gravity
+        if (!Grounded())
         {
-            velocity.y = 0;
-        }
-        else
-        {
-            velocity.y -= physSettings.downAccel;
+            velocity -= Vector3.down * physSettings.gravity * (physSettings.fullJumpMult - 1) * Time.deltaTime;
+            // eventualmente mejorar feel de salto
         }
     }
 
@@ -157,13 +158,15 @@ public class CharacterController : MonoBehaviour
         else
         {
             //decrease velocity.y
-            velocity.y -= physSettings.downAccel;
+            velocity.y -= physSettings.gravity;
         }
     }
 
     private void JumpAction (InputAction.CallbackContext context)
     {
         isJump = true;
+        if (Grounded())
+            velocity = Vector3.up * moveSettings.jumpVelocity;
     }
 
     public void OnEnable()
