@@ -92,10 +92,24 @@ public class CharacterController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        rBody.velocity = transform.TransformDirection(velocity);
         PlayerMovement();
         PlayerRotation();
-        //Jump();
-        rBody.velocity = transform.TransformDirection(velocity);
+        Gravity();
+    }
+
+    private void Gravity()
+    {
+        //Gravity
+        if (!Grounded())
+        {
+            velocity -= Vector3.down * physSettings.gravity * (physSettings.fullJumpMult - 1) * Time.deltaTime;
+            // eventualmente mejorar feel de salto
+        }
+        else if (Grounded() && !inputAction.Player.Jump.triggered)
+        {
+            velocity.y = 0;
+        }
     }
 
     private void PlayerMovement()
@@ -116,13 +130,6 @@ public class CharacterController : MonoBehaviour
         camR.Normalize();
 
         transform.position += (camF * input.y + camR * input.x) * moveSettings.runVelocity * Time.deltaTime;
-
-        //Gravity
-        if (!Grounded())
-        {
-            velocity -= Vector3.down * physSettings.gravity * (physSettings.fullJumpMult - 1) * Time.deltaTime;
-            // eventualmente mejorar feel de salto
-        }
     }
 
     private void PlayerRotation()
