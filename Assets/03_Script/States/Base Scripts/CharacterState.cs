@@ -8,27 +8,43 @@ namespace playerScripts
     {
         public List<StateData> ListAbilityData = new List<StateData>();
 
-        public void UpdateAll(CharacterState characterState, Animator animator)
+        public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
+        {
+            foreach(StateData d in ListAbilityData)
+            {
+                d.OnEnter(this, animator, stateInfo);
+            }
+        }
+
+        public void UpdateAll(CharacterState characterState, Animator animator, AnimatorStateInfo stateInfo)
         {
             foreach (StateData d in ListAbilityData)
             {
-                d.UpdateAbility(characterState, animator);
+                d.UpdateAbility(characterState, animator, stateInfo);
             }
         }
 
         public override void OnStateUpdate(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            UpdateAll(this, animator);
+            UpdateAll(this, animator, stateInfo);
         }
 
-        private CharacterController characterController;
-        public CharacterController GetCharacterController(Animator animator)
+        public override void OnStateExit(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
-            if (characterController == null)
+            foreach (StateData d in ListAbilityData)
             {
-                characterController = animator.GetComponentInParent<CharacterController>();
+                d.OnExit(this, animator, stateInfo);
             }
-            return characterController;
+        }
+
+        private CharacterControl characterControl;
+        public CharacterControl GetCharacterControl(Animator animator)
+        {
+            if (characterControl == null)
+            {
+                characterControl = animator.GetComponentInParent<CharacterControl>();
+            }
+            return characterControl;
         }
     }
 }

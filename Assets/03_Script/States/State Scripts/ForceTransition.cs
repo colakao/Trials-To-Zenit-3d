@@ -4,28 +4,28 @@ using UnityEngine;
 
 namespace playerScripts
 {
-    [CreateAssetMenu(fileName = "New MoveData", menuName = "State Machine/Ability/Idle")]
-    public class IdleData : StateData
+    [CreateAssetMenu(fileName = "New MoveData", menuName = "State Machine/Ability/Force Transition")]
+    public class ForceTransition : StateData
     {
+        [Range(0.01f,1f)]
+        public float transitionTime;
+
         public override void OnEnter(CharacterState characterState, Animator animator, AnimatorStateInfo stateInfo)
         {
-            
+
         }
+
         public override void UpdateAbility(CharacterState characterState, Animator animator, AnimatorStateInfo stateInfo)
         {
-            if (VirtualInputManager.Instance.movement.magnitude > 0)
+            if (stateInfo.normalizedTime >= transitionTime)
             {
-                animator.SetBool(TransitionParameter.isMove.ToString(), true);
-            }
-            if (characterState.GetCharacterControl(animator).jump)
-            {
-                animator.SetBool(TransitionParameter.jump.ToString(), true);
-                //characterState.GetCharacterControl(animator).jump = false;
+                animator.SetBool(TransitionParameter.forceTransition.ToString(), true);
             }
         }
+
         public override void OnExit(CharacterState characterState, Animator animator, AnimatorStateInfo stateInfo)
         {
-
+            animator.SetBool(TransitionParameter.forceTransition.ToString(), false);
         }
     }
 }

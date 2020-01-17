@@ -54,7 +54,7 @@ namespace playerScripts
         Vector3 camVelocity = Vector3.zero;
 
         PlayerInput inputActions;
-        CharacterController charController;
+        CharacterControl charController;
         CameraCollision collision;
         float vOrbitInput, hOrbitInput, zoomInput;
 
@@ -81,13 +81,13 @@ namespace playerScripts
 
             if (target != null)
             {
-                if (target.GetComponent<CharacterController>())
+                if (target.GetComponent<CharacterControl>())
                 {
-                    charController = target.GetComponent<CharacterController>();
+                    charController = target.GetComponent<CharacterControl>();
                 }
                 else
                 {
-                    Debug.LogError("Target is missing a CharacterController");
+                    Debug.LogError("Target is missing a CharacterControl");
                 }
             }
             else

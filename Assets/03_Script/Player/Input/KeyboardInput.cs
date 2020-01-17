@@ -9,10 +9,11 @@ namespace playerScripts
         [HideInInspector]
         public Vector2 input; // Movement
 
-        void FixedUpdate()
+        void Update()
         {
             Movement();
             Attack();
+            Jump();
         }
 
         #region Movement
@@ -24,6 +25,18 @@ namespace playerScripts
 
             VirtualInputManager.Instance.movement.x = input.x;
             VirtualInputManager.Instance.movement.y = input.y;
+        }
+
+        void Jump()
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                VirtualInputManager.Instance.jump = true;
+            }
+            else
+            {
+                VirtualInputManager.Instance.jump = false;
+            }
         }
         #endregion
 

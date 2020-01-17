@@ -7,11 +7,17 @@ namespace playerScripts
     [CreateAssetMenu(fileName = "New MoveData", menuName = "State Machine/Ability/Move")]
     public class MoveData : StateData
     {
+        [Range(1f,10f)]
         public float runVelocity;
 
-        public override void UpdateAbility(CharacterState characterState, Animator animator)
+        public override void OnEnter(CharacterState characterState, Animator animator, AnimatorStateInfo stateInfo)
         {
-            CharacterController cc = characterState.GetCharacterController(animator);
+            
+        }
+
+        public override void UpdateAbility(CharacterState characterState, Animator animator, AnimatorStateInfo stateInfo)
+        {
+            CharacterControl cc = characterState.GetCharacterControl(animator);
             if (VirtualInputManager.Instance.movement.magnitude == 0)
             {
                 animator.SetBool(TransitionParameter.isMove.ToString(), false);
@@ -30,6 +36,16 @@ namespace playerScripts
 
                 cc.transform.position += (camF * input.y + camR * input.x) * runVelocity * Time.deltaTime;
             }
+            if (characterState.GetCharacterControl(animator).jump)
+            {
+                animator.SetBool(TransitionParameter.jump.ToString(), true);
+                //characterState.GetCharacterControl(animator).jump = false;
+            }
+        }
+
+        public override void OnExit(CharacterState characterState, Animator animator, AnimatorStateInfo stateInfo)
+        {
+            
         }
     }
 }
