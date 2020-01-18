@@ -91,6 +91,17 @@ namespace playerScripts
             }
         }
 
+        //private void LateUpdate()
+        //{
+        //    if (Grounded())
+        //    {
+        //        if (VirtualInputManager.Instance.jump)
+        //            jump = true;
+        //        else
+        //            jump = false;
+        //    }
+        //}
+
         private void FixedUpdate()
         {
             if (rB != null)
@@ -109,14 +120,9 @@ namespace playerScripts
             {
                 velocity -= Vector3.down * physSettings.gravity * (physSettings.fullJumpMult - 1) * Time.deltaTime;
             }
-            if (Grounded() && !VirtualInputManager.Instance.jump)
+            if (Grounded() && !jump)
             {
                 velocity.y = 0;
-            }
-            if (Grounded() && VirtualInputManager.Instance.jump)
-            {
-                //Jump
-                jump = true;
             }
         }
 

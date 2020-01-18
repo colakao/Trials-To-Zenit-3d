@@ -9,6 +9,7 @@ namespace playerScripts
     {
         [Range(1f,10f)]
         public float runVelocity;
+        public AnimationCurve speedGraph;
 
         public override void OnEnter(CharacterState characterState, Animator animator, AnimatorStateInfo stateInfo)
         {
@@ -34,12 +35,11 @@ namespace playerScripts
                 camF.Normalize();
                 camR.Normalize();
 
-                cc.transform.position += (camF * input.y + camR * input.x) * runVelocity * Time.deltaTime;
+                cc.transform.position += (camF * input.y + camR * input.x) * runVelocity * speedGraph.Evaluate(stateInfo.normalizedTime) * Time.deltaTime;
             }
             if (characterState.GetCharacterControl(animator).jump)
             {
                 animator.SetBool(TransitionParameter.jump.ToString(), true);
-                //characterState.GetCharacterControl(animator).jump = false;
             }
         }
 

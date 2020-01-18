@@ -20,7 +20,6 @@ namespace playerScripts
             if (characterState.GetCharacterControl(animator).jump)
             {
                 animator.SetBool(TransitionParameter.jump.ToString(), true);
-                //characterState.GetCharacterControl(animator).jump = false;
             }
         }
         public override void OnExit(CharacterState characterState, Animator animator, AnimatorStateInfo stateInfo)

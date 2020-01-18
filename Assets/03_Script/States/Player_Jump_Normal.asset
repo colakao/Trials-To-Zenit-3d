@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Player_Jump_Normal
   m_EditorClassIdentifier: 
   Duration: 0
-  jumpVelocity: 40
+  jumpForce: 15000
