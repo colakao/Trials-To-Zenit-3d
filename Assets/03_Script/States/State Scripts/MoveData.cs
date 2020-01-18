@@ -35,7 +35,14 @@ namespace playerScripts
                 camF.Normalize();
                 camR.Normalize();
 
-                cc.transform.position += (camF * input.y + camR * input.x) * runVelocity * speedGraph.Evaluate(stateInfo.normalizedTime) * Time.deltaTime;
+                if (!cc.Slope())
+                {
+                    cc.transform.position += (camF * input.y + camR * input.x) * runVelocity * speedGraph.Evaluate(stateInfo.normalizedTime) * Time.deltaTime;
+                }
+                if (cc.Slope())
+                {
+                    cc.transform.position += ((camF * input.y + camR * input.x) - new Vector3(0,cc.physSettings.slopeY,0)) * runVelocity * speedGraph.Evaluate(stateInfo.normalizedTime) * Time.deltaTime;
+                }
             }
             if (characterState.GetCharacterControl(animator).jump)
             {

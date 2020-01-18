@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Player_Jump_Normal_ForceTransition
   m_EditorClassIdentifier: 
   Duration: 0
-  transitionTime: 0.631
+  transitionTime: 0.4

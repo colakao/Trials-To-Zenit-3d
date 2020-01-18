@@ -24,8 +24,10 @@ namespace playerScripts
         public class DebugSettings
         {
             public bool debugRay;
+            public bool debugRaySlope;
             public LayerMask ground;
             public float distToGrounded = 0.1f;
+            public float distToSloped = 1.5f;
         }
         [System.Serializable]
         public class PhysSettings
@@ -34,6 +36,8 @@ namespace playerScripts
 
             public float fullJumpMult = 2.5f;
             public float lowJumpMult = 2f;
+
+            public float slopeY;
         }
 
         public RotateSettings rotateSettings = new RotateSettings();
@@ -42,6 +46,7 @@ namespace playerScripts
 
         public bool jump;
         public bool isGrounded;
+        public bool isSloped;
 
         Animator playerAnim;
         float forwardInput, rightInput;
@@ -54,9 +59,27 @@ namespace playerScripts
 
         Rigidbody rB;
 
+        public float count = 0;
+
         public bool Grounded()
         {
             return Physics.Raycast(transform.position, Vector3.down, debugSettings.distToGrounded, debugSettings.ground);
+        }
+
+        public bool Slope()
+        {
+            if (jump)
+                return false;
+
+            RaycastHit hit;
+
+            if (Physics.Raycast(transform.position, Vector3.down, out hit, debugSettings.distToSloped))
+                if (hit.normal != Vector3.up)
+                {
+                    physSettings.slopeY = hit.normal.y;
+                    return true;
+                }      
+            return false;
         }
 
         private void Awake()
@@ -71,36 +94,36 @@ namespace playerScripts
                 rB = GetComponent<Rigidbody>();
             else
                Debug.LogError("The player needs a rigidbody");
+
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             if (debugSettings.debugRay)
             {
                 Debug.DrawLine(transform.position, new Vector3(transform.position.x, transform.position.y - debugSettings.distToGrounded, transform.position.z), Color.cyan);
             }
+            if (debugSettings.debugRaySlope)
+            {
+                Debug.DrawLine(transform.position, new Vector3(transform.position.x, transform.position.y - debugSettings.distToSloped, transform.position.z), Color.yellow);
+            }
+
             if (Grounded())
             {
                 isGrounded = true;
                 playerAnim.SetBool(TransitionParameter.isGrounded.ToString(), true);
             }
-            else
+            if (!Grounded())
             {
+                jump = false;
                 isGrounded = false;
                 playerAnim.SetBool(TransitionParameter.isGrounded.ToString(), false);
             }
+            if (Slope())
+                isSloped = true;
+            if (!Slope())
+                isSloped = false;
         }
-
-        //private void LateUpdate()
-        //{
-        //    if (Grounded())
-        //    {
-        //        if (VirtualInputManager.Instance.jump)
-        //            jump = true;
-        //        else
-        //            jump = false;
-        //    }
-        //}
 
         private void FixedUpdate()
         {
@@ -118,9 +141,9 @@ namespace playerScripts
             //Gravity
             if (!Grounded())
             {
-                velocity -= Vector3.down * physSettings.gravity * (physSettings.fullJumpMult - 1) * Time.deltaTime;
+                velocity -= Vector3.down * physSettings.gravity /** (physSettings.fullJumpMult - 1)*/ * Time.deltaTime;
             }
-            if (Grounded() && !jump)
+            if (Grounded())
             {
                 velocity.y = 0;
             }

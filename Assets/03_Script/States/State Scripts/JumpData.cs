@@ -11,8 +11,6 @@ namespace playerScripts
         public float jumpForce = 5000f;
         public override void OnEnter(CharacterState characterState, Animator animator, AnimatorStateInfo stateInfo)
         {
-            //characterState.GetCharacterControl(animator).jump = false;
-            //characterState.GetCharacterControl(animator).velocity = Vector3.up * jumpVelocity;
             characterState.GetCharacterControl(animator).GetComponent<Rigidbody>().AddForce(Vector3.up * jumpForce);
         }
 
@@ -24,7 +22,7 @@ namespace playerScripts
 
         public override void OnExit(CharacterState characterState, Animator animator, AnimatorStateInfo stateInfo)
         {
-            characterState.GetCharacterControl(animator).jump = false;
+            //characterState.GetCharacterControl(animator).jump = false;
         }
     }
 }

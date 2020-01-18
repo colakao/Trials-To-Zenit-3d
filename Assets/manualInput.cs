@@ -20,10 +20,6 @@ namespace playerScripts
                 {
                     cc.jump = true;
                 }
-                else
-                {
-                    cc.jump = false;
-                }
             }
         }
     }
