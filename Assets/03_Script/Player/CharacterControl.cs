@@ -18,13 +18,19 @@ namespace playerScripts
         [System.Serializable]
         public class RotateSettings
         {
-            public float rotateVelocity = 12f;
+            [HideInInspector]
+            public float angle;
+            [HideInInspector]
+            public Quaternion targetRotation;
+            [Tooltip("Valores mas pequenos causan un offset en el movimiento del jugador.")]
+            public float rotateVelocity = 12f;    
         }
         [System.Serializable]
         public class DebugSettings
         {
             public bool debugRay;
             public bool debugRaySlope;
+            public bool debugForwardRay;
             public LayerMask ground;
             public float distToGrounded = 0.1f;
             public float distToSloped = 1.5f;
@@ -37,54 +43,40 @@ namespace playerScripts
             public float fullJumpMult = 2.5f;
             public float lowJumpMult = 2f;
 
-            public float slopeY;
+            [HideInInspector]
+            public float groundAngle;
+            [HideInInspector]
+            public Vector3 forward;
+            public float maxSlopeAngle;
         }
 
         public RotateSettings rotateSettings = new RotateSettings();
         public PhysSettings physSettings = new PhysSettings();
         public DebugSettings debugSettings = new DebugSettings();
 
+        [Header("Debug bools")]
         public bool jump;
         public bool isGrounded;
         public bool isSloped;
+
+
 
         Animator playerAnim;
         float forwardInput, rightInput;
         Vector3 camF, camR;
 
         Vector2 input;
+        Transform cam;
 
         [HideInInspector]
         public Vector3 velocity = Vector3.zero;
 
         Rigidbody rB;
 
-        public float count = 0;
-
-        public bool Grounded()
-        {
-            return Physics.Raycast(transform.position, Vector3.down, debugSettings.distToGrounded, debugSettings.ground);
-        }
-
-        public bool Slope()
-        {
-            if (jump)
-                return false;
-
-            RaycastHit hit;
-
-            if (Physics.Raycast(transform.position, Vector3.down, out hit, debugSettings.distToSloped))
-                if (hit.normal != Vector3.up)
-                {
-                    physSettings.slopeY = hit.normal.y;
-                    return true;
-                }      
-            return false;
-        }
-
         private void Awake()
         {
             playerAnim = transform.GetChild(0).GetComponent<Animator>();
+            cam = Camera.main.transform;
         }
 
         private void Start()
@@ -107,6 +99,10 @@ namespace playerScripts
             {
                 Debug.DrawLine(transform.position, new Vector3(transform.position.x, transform.position.y - debugSettings.distToSloped, transform.position.z), Color.yellow);
             }
+            if (debugSettings.debugForwardRay)
+            {
+                Debug.DrawLine(transform.position + new Vector3(0, 0.5f, 0), transform.position + new Vector3(0,0.5f,0) + physSettings.forward * 3f, Color.yellow);
+            }
 
             if (Grounded())
             {
@@ -115,6 +111,8 @@ namespace playerScripts
             }
             if (!Grounded())
             {
+                physSettings.forward = transform.forward; // 1
+                physSettings.groundAngle = 90f; // 2
                 jump = false;
                 isGrounded = false;
                 playerAnim.SetBool(TransitionParameter.isGrounded.ToString(), false);
@@ -122,7 +120,11 @@ namespace playerScripts
             if (Slope())
                 isSloped = true;
             if (!Slope())
+            {
+                physSettings.forward = transform.forward;
+                physSettings.groundAngle = 90f; // 
                 isSloped = false;
+            }
         }
 
         private void FixedUpdate()
@@ -132,8 +134,31 @@ namespace playerScripts
             else
                 Debug.LogError("The player needs a rigidbody");
 
+            CalculateAngle();
             PlayerRotation();
             Gravity();
+        }
+
+        public bool Grounded()
+        {
+            return Physics.Raycast(transform.position, Vector3.down, debugSettings.distToGrounded, debugSettings.ground);
+        }
+
+        public bool Slope()
+        {
+            if (jump)
+                return false;
+
+            RaycastHit hit;
+
+            if (Physics.Raycast(transform.position, Vector3.down, out hit, debugSettings.distToSloped))
+                if (hit.normal != Vector3.up)
+                {
+                    physSettings.forward = Vector3.Cross(transform.right, hit.normal); // 1
+                    physSettings.groundAngle = Vector3.Angle(hit.normal, transform.forward); // 2
+                    return true;
+                }
+            return false;
         }
 
         private void Gravity()
@@ -149,26 +174,20 @@ namespace playerScripts
             }
         }
 
-        private void PlayerRotation()
+        private void CalculateAngle()
         {
             input = VirtualInputManager.Instance.movement;
-            camF = Camera.main.transform.forward;
-            camR = Camera.main.transform.right;
-            camF.y = 0;
-            camR.y = 0;
+            rotateSettings.angle = Mathf.Atan2(input.x, input.y);
+            rotateSettings.angle = Mathf.Rad2Deg * rotateSettings.angle;
+            rotateSettings.angle += cam.eulerAngles.y;
+        }
 
-            //Look at cam direction when you move
-            var intent = camF * input.y + camR * input.x;
-
+        private void PlayerRotation()
+        {
             if (input.magnitude > 0)
             {
-                playerAnim.SetBool(TransitionParameter.isMove.ToString(), true);
-                Quaternion rot = Quaternion.LookRotation(intent);
-                transform.rotation = Quaternion.Lerp(transform.rotation, rot, rotateSettings.rotateVelocity * Time.deltaTime);
-            }
-            else if (input.magnitude == 0)
-            {
-                playerAnim.SetBool(TransitionParameter.isMove.ToString(), false);
+                rotateSettings.targetRotation = Quaternion.Euler(0, rotateSettings.angle, 0);
+                transform.rotation = Quaternion.Slerp(transform.rotation, rotateSettings.targetRotation, rotateSettings.rotateVelocity * Time.deltaTime);
             }
         }
     }

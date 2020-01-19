@@ -25,24 +25,8 @@ namespace playerScripts
             }
             if (VirtualInputManager.Instance.movement.magnitude > 0)
             {
-                var input = VirtualInputManager.Instance.movement;
+                cc.transform.position += cc.physSettings.forward * runVelocity * speedGraph.Evaluate(stateInfo.normalizedTime) * Time.deltaTime;
 
-                var camF = Camera.main.transform.forward;
-                var camR = Camera.main.transform.right;
-
-                camF.y = 0f;
-                camR.y = 0f;
-                camF.Normalize();
-                camR.Normalize();
-
-                if (!cc.Slope())
-                {
-                    cc.transform.position += (camF * input.y + camR * input.x) * runVelocity * speedGraph.Evaluate(stateInfo.normalizedTime) * Time.deltaTime;
-                }
-                if (cc.Slope())
-                {
-                    cc.transform.position += ((camF * input.y + camR * input.x) - new Vector3(0,cc.physSettings.slopeY,0)) * runVelocity * speedGraph.Evaluate(stateInfo.normalizedTime) * Time.deltaTime;
-                }
             }
             if (characterState.GetCharacterControl(animator).jump)
             {
