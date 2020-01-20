@@ -7,8 +7,8 @@ namespace playerScripts
     [CreateAssetMenu(fileName = "New MoveData", menuName = "State Machine/Ability/Jump")]
     public class JumpData : StateData
     {
-        [Range(2000,15000)]
-        public float jumpForce = 5000f;
+        [Range(200,1500)]
+        public float jumpForce = 200;
         public override void OnEnter(CharacterState characterState, Animator animator, AnimatorStateInfo stateInfo)
         {
             characterState.GetCharacterControl(animator).GetComponent<Rigidbody>().AddForce(Vector3.up * jumpForce);

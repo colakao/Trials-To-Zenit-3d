@@ -9,6 +9,7 @@ namespace playerScripts
         // movement input
         public Vector2 movement;
         public bool jump;
+        public bool attack;
     }
 }
 

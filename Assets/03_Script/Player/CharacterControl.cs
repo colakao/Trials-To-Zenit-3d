@@ -11,6 +11,7 @@ namespace playerScripts
         jump,
         forceTransition,
         isGrounded,
+        attack,
     }
 
     public class CharacterControl : MonoBehaviour
@@ -40,8 +41,8 @@ namespace playerScripts
         {
             public float gravity = -9.81f;
 
-            public float fullJumpMult = 2.5f;
-            public float lowJumpMult = 2f;
+            //public float fullJumpMult = 2.5f;
+            //public float lowJumpMult = 2f;
 
             [HideInInspector]
             public float groundAngle;
@@ -56,16 +57,17 @@ namespace playerScripts
 
         [Header("Debug bools")]
         public bool jump;
+        public bool attack;
+
         public bool isGrounded;
         public bool isSloped;
 
-
-
         Animator playerAnim;
-        float forwardInput, rightInput;
-        Vector3 camF, camR;
+        //float forwardInput, rightInput;
+        //Vector3 camF, camR;
 
-        Vector2 input;
+        [HideInInspector]
+        public Vector2 input;
         Transform cam;
 
         [HideInInspector]
@@ -83,10 +85,12 @@ namespace playerScripts
         {
             Cursor.visible = false;
             if (GetComponent<Rigidbody>())
+            {
                 rB = GetComponent<Rigidbody>();
+                rB.velocity = velocity;
+            }
             else
-               Debug.LogError("The player needs a rigidbody");
-
+                Debug.LogError("The player needs a rigidbody");
         }
 
         private void LateUpdate()
@@ -129,14 +133,14 @@ namespace playerScripts
 
         private void FixedUpdate()
         {
-            if (rB != null)
-            rB.velocity = transform.TransformDirection(velocity);
-            else
-                Debug.LogError("The player needs a rigidbody");
+            //if (rB != null)
+            //    rB.velocity = transform.TransformDirection(velocity);
+            //else
+            //    Debug.LogError("The player needs a rigidbody");
 
+            Gravity();
             CalculateAngle();
             PlayerRotation();
-            Gravity();
         }
 
         public bool Grounded()
@@ -155,7 +159,7 @@ namespace playerScripts
                 if (hit.normal != Vector3.up)
                 {
                     physSettings.forward = Vector3.Cross(transform.right, hit.normal); // 1
-                    physSettings.groundAngle = Vector3.Angle(hit.normal, transform.forward); // 2
+                    physSettings.groundAngle = Vector3.Angle(hit.normal, -transform.forward); // 2
                     return true;
                 }
             return false;
@@ -166,17 +170,26 @@ namespace playerScripts
             //Gravity
             if (!Grounded())
             {
-                velocity -= Vector3.down * physSettings.gravity /** (physSettings.fullJumpMult - 1)*/ * Time.deltaTime;
+                rB.velocity -= Vector3.down * physSettings.gravity * Time.deltaTime;
             }
-            if (Grounded())
+            if (Grounded() && Mathf.Approximately(input.magnitude, 0))
             {
-                velocity.y = 0;
+                //var v = rB.velocity;
+                //v.y = 0;
+                rB.velocity = Vector3.zero;
+            }
+            if (Grounded() && input.magnitude > 0)
+            {
+                var v = rB.velocity;
+                v.y = 0;
+                rB.velocity = v;
             }
         }
 
         private void CalculateAngle()
         {
-            input = VirtualInputManager.Instance.movement;
+            //input = VirtualInputManager.Instance.movement;
+            input = GetComponent<ManualInput>().input;
             rotateSettings.angle = Mathf.Atan2(input.x, input.y);
             rotateSettings.angle = Mathf.Rad2Deg * rotateSettings.angle;
             rotateSettings.angle += cam.eulerAngles.y;
